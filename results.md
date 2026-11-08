@@ -20,3 +20,11 @@ step 12 รัน pytest -v test_no_session.py 3 ครั้ง
 | exclude 1 ชิ้น (1 tool) | `["Knife"]`, `["Scissors"]` (มีแล้ว) |
 | exclude 2 ชิ้น (2 tools) | `["Knife", "Scissors"]` |
 | exclude ทั้ง 3 ชิ้น (3 tools) | `["Knife", "Pizza cutter", "Scissors"]` |
+
+## Defect report
+
+- Title: POST /api/pizza answers 500 with an empty body when all three tools are excluded
+- Request: `POST https://quickpizza.grafana.com/api/pizza` with header `Authorization: token <token>` and body `{"excludedTools": ["Knife", "Pizza cutter", "Scissors"]}`
+- Expected result: status 400 and a JSON error message, because no pizza can be cut without a tool
+- Actual result: status 500 Internal Server Error with an empty body
+- Severity: Medium. The failure repeats on every request with this input, and the caller gets no message that says what was wrong. No data is lost.
