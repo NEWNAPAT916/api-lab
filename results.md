@@ -14,4 +14,9 @@ step 12 รัน pytest -v test_no_session.py 3 ครั้ง
 2. 1 failed in 2.18s
 3. 1 failed in 2.21s
 
-
+| Block | ตัวอย่าง input |
+|---|---|
+| ไม่ exclude เลย (0 tools) | `[]` |
+| exclude 1 ชิ้น (1 tool) | `["Knife"]`, `["Scissors"]` (มีแล้ว) |
+| exclude 2 ชิ้น (2 tools) | `["Knife", "Scissors"]` |
+| exclude ทั้ง 3 ชิ้น (3 tools) | `["Knife", "Pizza cutter", "Scissors"]` |
