@@ -18,3 +18,55 @@ def test_stars_out_of_range(api, auth, pizza_id, stars):
     res = api.post("/api/ratings", json=new, headers=auth)
     assert res.status_code == 400
     assert res.json() == {"error": STARS_ERROR}
+
+# C2: stars that is a decimal number is refused.
+def test_stars_decimal_is_refused(api, auth, pizza_id):
+    new = {"pizza_id": pizza_id, "stars": 3.5}
+    res = api.post("/api/ratings", json=new, headers=auth)
+    assert res.status_code == 400
+    assert res.json() == {
+        "error": "json: cannot unmarshal number 3.5 into Go struct field Rating.stars of type int"
+    }
+
+
+# C2: stars given as text is refused.
+def test_stars_text_is_refused(api, auth, pizza_id):
+    new = {"pizza_id": pizza_id, "stars": "3"}
+    res = api.post("/api/ratings", json=new, headers=auth)
+    assert res.status_code == 400
+    assert res.json() == {
+        "error": "json: cannot unmarshal string into Go struct field Rating.stars of type int"
+    }
+
+
+# C2: a request without the stars field is refused.
+def test_stars_missing_is_refused(api, auth, pizza_id):
+    new = {"pizza_id": pizza_id}
+    res = api.post("/api/ratings", json=new, headers=auth)
+    assert res.status_code == 400
+    assert res.json() == {"error": STARS_ERROR}
+
+
+# C3: a pizza that does not exist is refused.
+def test_unknown_pizza_is_refused(api, auth):
+    new = {"pizza_id": 999999999, "stars": 3}
+    res = api.post("/api/ratings", json=new, headers=auth)
+    assert res.status_code == 400
+    assert res.json() == {"error": "pizza ID 999999999 not found"}
+
+
+# C4: a request without a token is refused.
+def test_no_token_is_refused(api, pizza_id):
+    new = {"pizza_id": pizza_id, "stars": 3}
+    res = api.post("/api/ratings", json=new)
+    assert res.status_code == 401
+    assert res.json() == {"error": "authentication failed"}
+
+
+# C4: a token of the wrong length is refused.
+def test_short_token_is_refused(api, pizza_id):
+    new = {"pizza_id": pizza_id, "stars": 3}
+    res = api.post("/api/ratings", json=new,
+                   headers={"Authorization": "token short"})
+    assert res.status_code == 401
+    assert res.json() == {"error": "authentication failed"}
